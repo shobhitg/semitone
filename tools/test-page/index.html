@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Semitone — test harness</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; padding: 32px 24px 80px;
+    background: #0D1014; color: #E6EAEF;
+    font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 26px; }
+  h1 { font-size: 26px; margin: 0; letter-spacing: -.02em; }
+  h2 { font-size: 15px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: .08em; color: #8A94A2; }
+  .card { background: #161B22; border: 1px solid #262D36; border-radius: 12px; padding: 20px; }
+  audio { width: 100%; margin-top: 8px; }
+  button {
+    background: #1D242D; color: #E6EAEF; border: 1px solid #384250;
+    border-radius: 8px; padding: 10px 14px; font-size: 14px; cursor: pointer;
+  }
+  button:hover { background: #262D36; }
+  button:focus-visible { outline: 2px solid #FB923C; outline-offset: 2px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  code, kbd {
+    background: #0D1014; border: 1px solid #262D36; border-radius: 4px;
+    padding: 1px 5px; font-family: ui-monospace, Menlo, monospace; font-size: 12.5px;
+  }
+  .now { font-family: ui-monospace, Menlo, monospace; font-size: 13px; color: #FB923C; margin-top: 12px; }
+  ol { padding-left: 20px; margin: 0; }
+  li { margin-bottom: 10px; }
+  .pass { color: #4ADE80; }
+  .muted { color: #8A94A2; font-size: 13.5px; }
+  input[type=text] {
+    background: #0D1014; color: #E6EAEF; border: 1px solid #384250;
+    border-radius: 8px; padding: 9px 11px; font-family: ui-monospace, Menlo, monospace;
+    font-size: 12.5px; flex: 1; min-width: 260px;
+  }
+  #armResult { margin-top: 10px; font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }
+</style>
+</head>
+<body>
+<main>
+
+  <div>
+    <h1>Semitone — test harness</h1>
+    <p class="muted">
+      A known signal and a fake “next track”, so you can tell a broken extension from a
+      difficult website. Serve this folder over http and open it in the profile where the
+      extension is loaded.
+    </p>
+  </div>
+
+  <section class="card">
+    <h2>1 · Does the audio graph work</h2>
+    <p>
+      A C major arpeggio — C, E, G, C. Press play, then click the extension and press
+      <kbd>+</kbd> twice. You should hear the same shape a whole tone higher, with no
+      clicks and no dropouts.
+    </p>
+    <audio id="player" src="tone-a.wav" controls loop></audio>
+    <p class="now" id="now">track: tone-a.wav · url: /</p>
+  </section>
+
+  <section class="card">
+    <h2>2 · Does it reset between tracks</h2>
+    <p>
+      This is the feature. Set a key with the extension, then press each button. The
+      on-screen readout should snap to <code>0</code> and flash
+      <span class="pass">“Reset — new track”</span>. The toolbar badge should clear too.
+    </p>
+    <div class="row">
+      <button id="nextTrack">Next track (new src + pushState)</button>
+      <button id="urlOnly">URL change only (pushState)</button>
+      <button id="srcOnly">Source change only</button>
+    </div>
+    <p class="muted" style="margin-bottom:0">
+      All three simulate a YouTube soft navigation. None of them reload the page — if the
+      key survives any of them, the reset watcher has a gap.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>3 · Does the host-app bridge work</h2>
+    <p>
+      No extension id needed — this page just posts a window message, the way any local web app
+      would. Setting −2 should show that key in the on-screen readout.
+    </p>
+    <div class="row">
+      <button id="bridgeArm">Set −2 (no id)</button>
+      <button id="bridgeStatus">Ask status</button>
+      <button id="bridgePresets">Send a preset</button>
+    </div>
+    <div id="armResult" class="muted">not sent</div>
+    <p class="muted" style="margin-bottom:0">Detected: <span id="detected">checking…</span></p>
+  </section>
+
+  <section class="card">
+    <h2>Checklist</h2>
+    <ol>
+      <li>Pitch shifts up and down, and <strong>Reset</strong> returns to the original.</li>
+      <li>No click or gap when crossing zero in either direction.</li>
+      <li>All three buttons above clear the key.</li>
+      <li>Volume trim moves the level without distorting at +12 dB.</li>
+      <li><strong>Natural voice</strong> off vs on is audibly different on a voice track.</li>
+      <li>Toolbar badge matches the on-screen readout at all times.</li>
+      <li>Keyboard shortcuts work with the popup closed.</li>
+    </ol>
+  </section>
+
+</main>
+
+<script>
+  const player = document.getElementById('player');
+  const now = document.getElementById('now');
+  let n = 0;
+
+  const report = () => {
+    const file = player.getAttribute('src');
+    now.textContent = `track: ${file} · url: ${location.pathname}${location.search}`;
+  };
+
+  // Swap source the way a player does: set src, load, resume playback.
+  const swapTo = (file) => {
+    const wasPlaying = !player.paused;
+    player.src = file;
+    player.load();
+    if (wasPlaying) player.play().catch(() => {});
+    report();
+  };
+
+  document.getElementById('nextTrack').addEventListener('click', () => {
+    n++;
+    history.pushState({}, '', `?track=${n}`);
+    swapTo(n % 2 ? 'tone-b.wav' : 'tone-a.wav');
+  });
+
+  document.getElementById('urlOnly').addEventListener('click', () => {
+    n++;
+    history.pushState({}, '', `?nav=${n}`);
+    report();
+  });
+
+  document.getElementById('srcOnly').addEventListener('click', () => {
+    n++;
+    swapTo(n % 2 ? 'tone-b.wav' : 'tone-a.wav');
+  });
+
+  addEventListener('popstate', report);
+  report();
+
+  // ---- host-app bridge: no extension id required ----
+  const out = document.getElementById('armResult');
+  const detected = document.getElementById('detected');
+
+  const version = document.documentElement.dataset.semitone;
+  detected.textContent = version
+    ? `Semitone v${version} — bridge available`
+    : 'not detected (is the extension loaded, and is this page on localhost?)';
+
+  let seq = 0;
+  const call = (message) =>
+    new Promise((resolve) => {
+      const id = ++seq;
+      const onReply = (e) => {
+        if (e.source !== window || !e.data?.__semitoneReply || e.data.id !== id) return;
+        window.removeEventListener('message', onReply);
+        resolve(e.data.result);
+      };
+      window.addEventListener('message', onReply);
+      window.postMessage({ __semitone: true, id, ...message }, window.location.origin);
+      setTimeout(() => { window.removeEventListener('message', onReply); resolve(null); }, 1500);
+    });
+
+  const show = async (message) => {
+    out.textContent = 'sending…';
+    const result = await call(message);
+    out.textContent = result ? `reply: ${JSON.stringify(result)}` : 'no reply — extension not reachable';
+  };
+
+  document.getElementById('bridgeArm').addEventListener('click', () =>
+    show({ type: 'arm', semitone: -2, label: 'Slot 7 · Ana' }));
+  document.getElementById('bridgeStatus').addEventListener('click', () => show({ type: 'status' }));
+  document.getElementById('bridgePresets').addEventListener('click', () =>
+    show({ type: 'presets', presets: [{ key: 'yt:AzN4PKgPg-4', semitone: -3, cents: 0, label: 'Demo preset' }] }));
+
+</script>
+</body>
+</html>

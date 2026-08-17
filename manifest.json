@@ -1,0 +1,84 @@
+{
+   "//externally_connectable": "Any page on localhost can drive the extension. Intended for a local show-runner or setlist app; see README, Integrating your own app.",
+   "//host_permissions": "Declared, not optional. Automatic behaviour on a tab nobody clicked requires host access — Chrome offers no way around that — so it is granted at install and there is nothing to switch on.",
+   "action": {
+      "default_icon": {
+         "128": "icons/icon-128.png",
+         "16": "icons/icon-16.png",
+         "32": "icons/icon-32.png",
+         "48": "icons/icon-48.png"
+      },
+      "default_popup": "src/popup.html",
+      "default_title": "Semitone"
+   },
+   "background": {
+      "service_worker": "src/service-worker.js",
+      "type": "module"
+   },
+   "commands": {
+      "key-down": {
+         "description": "Key down one semitone",
+         "suggested_key": {
+            "default": "Alt+Shift+Down"
+         }
+      },
+      "key-reset": {
+         "description": "Reset to original key (panic)",
+         "suggested_key": {
+            "default": "Alt+Shift+0"
+         }
+      },
+      "key-up": {
+         "description": "Key up one semitone",
+         "suggested_key": {
+            "default": "Alt+Shift+Up"
+         }
+      }
+   },
+   "content_security_policy": {
+      "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+   },
+   "description": "Change the key of any karaoke track, live. Transpose up or down by semitones on YouTube, Smule or a local file.",
+   "externally_connectable": {
+      "matches": [
+         "http://localhost/*"
+      ]
+   },
+   "host_permissions": [
+      "*://*.youtube.com/*",
+      "*://*.youtu.be/*",
+      "*://*.smule.com/*",
+      "http://localhost/*"
+   ],
+   "icons": {
+      "128": "icons/icon-128.png",
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png"
+   },
+   "manifest_version": 3,
+   "minimum_chrome_version": "116",
+   "name": "Semitone — karaoke key control",
+   "options_ui": {
+      "open_in_tab": true,
+      "page": "src/options.html"
+   },
+   "permissions": [
+      "activeTab",
+      "scripting",
+      "storage"
+   ],
+   "short_name": "Semitone",
+   "version": "1.0.0",
+   "web_accessible_resources": [
+      {
+         "matches": [
+            "*://*/*"
+         ],
+         "resources": [
+            "vendor/SignalsmithStretch.mjs",
+            "vendor/signalsmith-worklet.js"
+         ]
+      }
+   ]
+}

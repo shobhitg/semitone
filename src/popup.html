@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Semitone</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="app">
+
+    <p id="status" class="status" hidden></p>
+
+
+    <section class="key-block">
+      <button id="down" class="step" aria-label="Key down one semitone">−</button>
+      <div class="readout">
+        <div id="key" class="key" data-neutral="1">0</div>
+        <div id="keyLabel" class="key-label">Original key</div>
+      </div>
+      <button id="up" class="step" aria-label="Key up one semitone">+</button>
+    </section>
+
+    <button id="reset" class="reset">Reset to original key</button>
+
+    <!-- Always visible. Whether a key sticks to a URL is the one behaviour worth a switch,
+         and getting it wrong is the difference between a clean show and a mystery key. -->
+    <section class="auto" id="autoRow">
+      <span class="dot" id="autoDot" aria-hidden="true"></span>
+      <div class="auto-text">
+        <div class="auto-title">Remember keys per video</div>
+        <div class="auto-sub" id="autoSummary">Checking…</div>
+      </div>
+      <button id="autoToggle" class="auto-btn">…</button>
+    </section>
+
+    <p class="foot" id="launcherLine"></p>
+
+    <details class="more">
+      <summary>Fine tune &amp; display</summary>
+
+      <section class="row">
+        <label class="row-label" for="cents">
+          Fine tune
+          <span class="hint">For a recording that isn’t at concert pitch. Not for choosing a key.</span>
+        </label>
+        <output id="centsOut" class="row-value">0 cents</output>
+      </section>
+      <input id="cents" class="slider" type="range" min="-50" max="50" step="5" value="0"
+             aria-label="Fine tune in cents">
+
+      <section class="row">
+        <label class="row-label" for="hudMode">On-screen readout</label>
+        <select id="hudMode" class="select">
+          <option value="auto">Only when a key is applied</option>
+          <option value="always">Always (stage mode)</option>
+          <option value="off">Off</option>
+        </select>
+      </section>
+
+      <section class="row">
+        <label class="row-label" for="hudCorner">Position</label>
+        <select id="hudCorner" class="select">
+          <option value="tr">Top right</option>
+          <option value="tl">Top left</option>
+          <option value="br">Bottom right</option>
+          <option value="bl">Bottom left</option>
+        </select>
+      </section>
+
+      <section class="row toggle-row">
+        <label class="row-label" for="debug">
+          Console logging
+          <span class="hint">Traces every step in the page's DevTools console</span>
+        </label>
+        <input id="debug" type="checkbox" class="toggle">
+      </section>
+
+      <p class="keys">
+        <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>↑</kbd> up &nbsp;·&nbsp;
+        <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>↓</kbd> down &nbsp;·&nbsp;
+        <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>0</kbd> reset
+      </p>
+      <p id="latency" class="foot"></p>
+    </details>
+
+    <p class="foot">The key clears itself whenever the track changes.</p>
+  </main>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

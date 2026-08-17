@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Semitone — diagnostics</title>
+  <link rel="stylesheet" href="popup.css">
+  <style>
+    body { width: auto; }
+    .page { max-width: 620px; margin: 0 auto; padding: 40px 24px 80px; display: flex; flex-direction: column; gap: 22px; }
+    h1 { font-size: 24px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
+    h2 { font-size: 15px; font-weight: 600; margin: 0 0 6px; }
+    p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--dim); }
+    .card-lg { border: 1px solid var(--line); border-radius: 12px; background: var(--card); padding: 20px; }
+    pre { margin: 10px 0 0; font-family: ui-monospace, Menlo, monospace; font-size: 12.5px;
+          line-height: 1.65; white-space: pre-wrap; color: var(--text); }
+    code { background: rgba(255,255,255,.06); border: 1px solid var(--line); border-radius: 4px;
+           padding: 1px 5px; font-size: 12.5px; }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>Semitone</h1>
+
+    <section class="card-lg">
+      <h2>How it decides a key</h2>
+      <p>
+        In order: a key pushed by the host app wins; then a key you set by hand,
+        if <strong>Remember keys per video</strong> is on; otherwise the track plays in its
+        original key. Every setting lives in the toolbar popup — there is nothing to configure
+        here.
+      </p>
+    </section>
+
+    <section class="card-lg">
+      <h2>Diagnostics</h2>
+      <p>Everything the extension currently believes. Useful when a key does not apply.</p>
+      <pre id="diag">Loading…</pre>
+    </section>
+  </main>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>
