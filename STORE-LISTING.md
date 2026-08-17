@@ -289,6 +289,14 @@ Pitch shifting by Signalsmith Stretch (MIT licence), running as a WebAssembly au
 All code ships inside the extension; nothing is downloaded at runtime.
 ```
 
+**Homepage URL** and **Support URL** — both further down the Store listing tab:
+```
+https://github.com/shobhitg/semitone
+```
+For Support you can point at `/issues` instead if you would rather funnel reports there. Both
+are optional, but a reviewer looking at an extension with declared host permissions finds a
+public source repo reassuring, and users get somewhere to go.
+
 **Category:** `Productivity` — Chrome has no music category, and this is a tool used while
 working through a setlist. (`Entertainment` is defensible; Productivity attracts fewer
 "this isn't a game" complaints.)
