@@ -373,8 +373,11 @@ is loopback only and cannot reach any remote site. Users who do not run such an 
 unaffected.
 ```
 
-**Remote code:** answer **No**. All code, including the WebAssembly, ships inside the
-package. `vendor/signalsmith-worklet.js` is pre-built precisely so nothing is fetched or
+**Remote code: answer NO.** Getting this wrong is the single easiest way to send yourself
+into a deep review. All code, including the WebAssembly, ships inside the package —
+`vendor/signalsmith-worklet.js` is pre-built precisely so nothing is fetched or generated at
+runtime. Answering Yes here means "this extension loads JS or Wasm from outside the package",
+which Semitone does not. `vendor/signalsmith-worklet.js` is pre-built precisely so nothing is fetched or
 generated at runtime — worth saying if a reviewer asks about the WASM.
 
 ### Data use disclosure
@@ -388,9 +391,9 @@ Then certify all three:
 - Not being used for purposes unrelated to the single purpose ✓
 - Not being used to determine creditworthiness or for lending ✓
 
-**Privacy policy URL:** not required when no data is collected. If the dashboard insists,
-a one-page statement saying "this extension collects no data" on any URL you control is
-enough.
+**Privacy policy URL:** REQUIRED, even with zero data collection — the field is marked with
+an asterisk regardless of what you tick above. `PRIVACY.md` in this repo is the text; publish
+it somewhere reachable and paste that URL. Fastest route is a public GitHub Gist.
 
 ---
 
